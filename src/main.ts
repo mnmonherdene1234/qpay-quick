@@ -1,14 +1,10 @@
-import QPayQuick from "./qpay-quick";
+import QPayQuick from "./qpay-quick/qpay-quick";
 
 async function main() {
   console.log("MAIN Started");
-  const qpayQuick: QPayQuick = QPayQuick.getInstance();
+  const qpayQuick: QPayQuick = await QPayQuick.getInstanceAsync();
 
-  console.log(qpayQuick.host);
-
-  setTimeout(() => {
-    qpayQuick.refresh();
-  }, 3000);
+  console.log(qpayQuick);
 }
 
 main();

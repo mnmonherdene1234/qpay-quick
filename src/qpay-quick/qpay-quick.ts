@@ -1,4 +1,9 @@
-class QPayQuick {
+import QPayCreateInvoiceResponse from "./qpay-create-invoice-response";
+import QPayInvoice from "./qpay-invoice";
+import QPayInvoiceBankAccount from "./qpay-invoice-bank-account";
+import QPayTokenResponse from "./qpay-token-response";
+
+export default class QPayQuick {
   private static instance: QPayQuick;
 
   private username: string = "TEST_VENDOR_MERCHANT";
@@ -25,6 +30,16 @@ class QPayQuick {
     return QPayQuick.instance;
   }
 
+  public static async getInstanceAsync(): Promise<QPayQuick> {
+    if (!QPayQuick.instance) {
+      QPayQuick.instance = new QPayQuick();
+      await QPayQuick.instance.token();
+      setInterval(QPayQuick.instance.checkExpiration, 1000 * 60);
+    }
+
+    return QPayQuick.instance;
+  }
+
   async token() {
     const response = await fetch(`${this._host}/v2/auth/token`, {
       method: "POST",
@@ -39,10 +54,10 @@ class QPayQuick {
       }),
     });
 
-    if (response.status === 200) {
+    if (response.ok) {
       const data = await response.json();
 
-      const tokenResponse = new TokenResponse({
+      const tokenResponse = new QPayTokenResponse({
         token_type: data["token_type"],
         refresh_expires_in: data["refresh_expires_in"],
         refresh_token: data["refresh_token"],
@@ -70,10 +85,10 @@ class QPayQuick {
       },
     });
 
-    if (response.status === 200) {
+    if (response.ok) {
       const data = await response.json();
 
-      const tokenResponse = new TokenResponse({
+      const tokenResponse = new QPayTokenResponse({
         token_type: data["token_type"],
         refresh_expires_in: data["refresh_expires_in"],
         refresh_token: data["refresh_token"],
@@ -92,6 +107,62 @@ class QPayQuick {
     }
   }
 
+  async createInvoice(qpayInvoice: QPayInvoice) {
+    const response = await fetch(`${this._host}/v2/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+      body: JSON.stringify(qpayInvoice),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(JSON.stringify(data));
+    }
+
+    const invoiceBankAccounts: QPayInvoiceBankAccount[] = [];
+
+    if (Array.isArray(data?.invoice_bank_accounts)) {
+      for (const account of data?.invoice_bank_accounts) {
+        invoiceBankAccounts.push(
+          new QPayInvoiceBankAccount({
+            id: account["id"],
+            account_bank_code: account["account_bank_code"],
+            account_number: account["account_number"],
+            account_name: account["account_name"],
+            is_default: account["is_default"],
+            invoice_id: account["invoice_id"],
+          })
+        );
+      }
+    }
+
+    const invoice: QPayCreateInvoiceResponse = new QPayCreateInvoiceResponse({
+      id: data["id"],
+      terminal_id: data["terminal_id"],
+      amount: data["amount"],
+      qr_code: data["qr_code"],
+      description: data["description"],
+      invoice_status: data["invoice_status"],
+      invoice_status_date: data["invoice_status_date"],
+      callback_url: data["callback_url"],
+      customer_name: data["customer_name"],
+      customer_logo: data["customer_logo"],
+      currency: data["currency"],
+      mcc_code: data["mcc_code"],
+      legacy_id: data["legacy_id"],
+      vendor_id: data["vendor_id"],
+      process_code_id: data["process_code_id"],
+      qr_image: data["qr_image"],
+      invoice_bank_accounts: invoiceBankAccounts,
+    });
+
+    return invoice;
+  }
+
   async checkExpiration() {
     const expiresDate = new Date(this.expiresIn);
     expiresDate.setHours(expiresDate.getHours() - 1, 0, 0, 0);
@@ -100,115 +171,5 @@ class QPayQuick {
     if (now > expiresDate) {
       await this.refresh();
     }
-  }
-}
-
-export default QPayQuick;
-
-export class TokenResponse {
-  token_type: string = "";
-  refresh_expires_in: number = 0;
-  refresh_token: string = "";
-  access_token: string = "";
-  expires_in: number = 0;
-  scope: string = "";
-  session_state: string = "";
-
-  constructor({
-    token_type = "",
-    refresh_expires_in = 0,
-    refresh_token = "",
-    access_token = "",
-    expires_in = 0,
-    scope = "",
-    session_state = "",
-  }: {
-    token_type?: string;
-    refresh_expires_in?: number;
-    refresh_token?: string;
-    access_token?: string;
-    expires_in?: number;
-    scope?: string;
-    session_state?: string;
-  }) {
-    this.token_type = token_type;
-    this.refresh_expires_in = refresh_expires_in;
-    this.refresh_token = refresh_token;
-    this.access_token = access_token;
-    this.expires_in = expires_in;
-    this.scope = scope;
-    this.session_state = session_state;
-  }
-}
-
-export class QPayInvoice {
-  merchant_id: string = "";
-  amount: number = 0;
-  currency: string = "";
-  customer_name: string = "";
-  customer_logo: string = "";
-  call_back_url: string = "";
-  description: string = "";
-  mcc_code: string = "";
-  back_accounts: BankAccount[] = [];
-
-  constructor({
-    merchant_id = "",
-    amount = 0,
-    currency = "",
-    customer_name = "",
-    customer_logo = "",
-    call_back_url = "",
-    description = "",
-    mcc_code = "",
-    back_accounts = [],
-  }: {
-    merchant_id: string;
-    amount: number;
-    currency: string;
-    customer_name: string;
-    customer_logo: string;
-    call_back_url: string;
-    description: string;
-    mcc_code: string;
-    back_accounts: BankAccount[];
-  }) {
-    this.merchant_id = merchant_id;
-    this.amount = amount;
-    this.currency = currency;
-    this.customer_name = customer_name;
-    this.customer_logo = customer_logo;
-    this.call_back_url = call_back_url;
-    this.description = description;
-    this.mcc_code = mcc_code;
-    this.back_accounts = back_accounts;
-  }
-}
-
-export class BankAccount {
-  default: boolean = true;
-  account_back_code: string = "";
-  account_number: string = "";
-  account_name: string = "";
-  is_default: boolean = true;
-
-  constructor({
-    $default = true,
-    account_back_code = "",
-    account_number = "",
-    account_name = "",
-    is_default = true,
-  }: {
-    $default?: boolean;
-    account_back_code?: string;
-    account_number?: string;
-    account_name?: string;
-    is_default?: boolean;
-  }) {
-    this.default = $default;
-    this.account_back_code = account_back_code;
-    this.account_number = account_number;
-    this.account_name = account_name;
-    this.is_default = is_default;
   }
 }
