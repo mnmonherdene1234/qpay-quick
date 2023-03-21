@@ -1,0 +1,14 @@
+{
+  "name": "qpay-quick",
+  "version": "1.0.0",
+  "main": "src/main.ts",
+  "license": "MIT",
+  "scripts": {
+    "start": "tsc && node dist/main.js",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.5",
+    "typescript": "^5.0.2"
+  }
+}
