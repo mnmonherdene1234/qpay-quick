@@ -10,6 +10,10 @@ export enum QPayEnvironment {
  */
 export enum AccountBankCode {
   /** @member {string} */
+  /** Default value*/
+  None = '',
+
+  /** @member {string} */
   /** Мобифинанс*/
   Mobifinance = '990000',
 

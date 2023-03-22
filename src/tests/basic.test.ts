@@ -1,5 +1,4 @@
 import QPayQuick from '..';
-import { AccountBankCode } from '../dto/qpay-enumerations';
 
 test('setup', async () => {
   expect(

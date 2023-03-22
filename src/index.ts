@@ -3,7 +3,7 @@ import QPayInvoice from './dto/qpay-invoice';
 import QPayInvoiceBankAccount from './dto/qpay-invoice-bank-account';
 import QPayTokenResponse from './dto/qpay-token-response';
 import QPayCheckPaymentResponse, { InvoiceStatus } from './dto/qpay-check-payment-response';
-import { QPayEnvironment } from './dto/qpay-enumerations';
+import { AccountBankCode, QPayEnvironment } from './dto/qpay-enumerations';
 
 export default class QPayQuick {
   private static instance: QPayQuick;
@@ -164,7 +164,7 @@ export default class QPayQuick {
         invoiceBankAccounts.push(
           new QPayInvoiceBankAccount({
             id: account?.id,
-            account_bank_code: account?.account_bank_code,
+            account_bank_code: account?.account_bank_code as AccountBankCode,
             account_number: account?.account_number,
             account_name: account?.account_name,
             is_default: account?.is_default,
@@ -219,7 +219,7 @@ export default class QPayQuick {
         invoiceBankAccounts.push(
           new QPayInvoiceBankAccount({
             id: account?.id,
-            account_bank_code: account?.account_bank_code,
+            account_bank_code: account?.account_bank_code as AccountBankCode,
             account_number: account?.account_number,
             account_name: account?.account_name,
             is_default: account?.is_default,

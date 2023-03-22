@@ -1,6 +1,8 @@
+import { AccountBankCode } from './qpay-enumerations';
+
 export default class QPayInvoiceBankAccount {
   id: string = '';
-  account_bank_code: string = '';
+  account_bank_code: AccountBankCode = AccountBankCode.None;
   account_number: string = '';
   account_name: string = '';
   is_default: boolean = true;
@@ -8,14 +10,14 @@ export default class QPayInvoiceBankAccount {
 
   constructor({
     id = '',
-    account_bank_code = '',
+    account_bank_code = AccountBankCode.None,
     account_number = '',
     account_name = '',
     is_default = true,
     invoice_id = '',
   }: {
     id?: string;
-    account_bank_code?: string;
+    account_bank_code?: AccountBankCode;
     account_number?: string;
     account_name?: string;
     is_default?: boolean;
