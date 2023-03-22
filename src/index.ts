@@ -80,13 +80,13 @@ export default class QPayQuick {
       const data = await response.json();
 
       const tokenResponse = new QPayTokenResponse({
-        token_type: data['token_type'],
-        refresh_expires_in: data['refresh_expires_in'],
-        refresh_token: data['refresh_token'],
-        access_token: data['access_token'],
-        expires_in: data['expires_in'],
-        scope: data['scope'],
-        session_state: data['session_state'],
+        token_type: data?.token_type,
+        refresh_expires_in: data?.refresh_expires_in,
+        refresh_token: data?.refresh_token,
+        access_token: data?.access_token,
+        expires_in: data?.expires_in,
+        scope: data?.scope,
+        session_state: data?.session_state,
       });
 
       this.accessToken = tokenResponse.access_token;
@@ -111,13 +111,13 @@ export default class QPayQuick {
       const data = await response.json();
 
       const tokenResponse = new QPayTokenResponse({
-        token_type: data['token_type'],
-        refresh_expires_in: data['refresh_expires_in'],
-        refresh_token: data['refresh_token'],
-        access_token: data['access_token'],
-        expires_in: data['expires_in'],
-        scope: data['scope'],
-        session_state: data['session_state'],
+        token_type: data?.token_type,
+        refresh_expires_in: data?.refresh_expires_in,
+        refresh_token: data?.refresh_token,
+        access_token: data?.access_token,
+        expires_in: data?.expires_in,
+        scope: data?.scope,
+        session_state: data?.session_state,
       });
 
       this.accessToken = tokenResponse.access_token;
@@ -165,34 +165,34 @@ export default class QPayQuick {
       for (const account of data?.invoice_bank_accounts) {
         invoiceBankAccounts.push(
           new QPayInvoiceBankAccount({
-            id: account['id'],
-            account_bank_code: account['account_bank_code'],
-            account_number: account['account_number'],
-            account_name: account['account_name'],
-            is_default: account['is_default'],
-            invoice_id: account['invoice_id'],
+            id: account?.id,
+            account_bank_code: account?.account_bank_code,
+            account_number: account?.account_number,
+            account_name: account?.account_name,
+            is_default: account?.is_default,
+            invoice_id: account?.invoice_id,
           }),
         );
       }
     }
 
     const invoice: QPayInvoiceResponse = new QPayInvoiceResponse({
-      id: data['id'],
-      terminal_id: data['terminal_id'],
-      amount: data['amount'],
-      qr_code: data['qr_code'],
-      description: data['description'],
-      invoice_status: data['invoice_status'],
-      invoice_status_date: data['invoice_status_date'],
-      callback_url: data['callback_url'],
-      customer_name: data['customer_name'],
-      customer_logo: data['customer_logo'],
-      currency: data['currency'],
-      mcc_code: data['mcc_code'],
-      legacy_id: data['legacy_id'],
-      vendor_id: data['vendor_id'],
-      process_code_id: data['process_code_id'],
-      qr_image: data['qr_image'],
+      id: data?.id,
+      terminal_id: data?.terminal_id,
+      amount: data?.amount,
+      qr_code: data?.qr_code,
+      description: data?.description,
+      invoice_status: data?.invoice_status,
+      invoice_status_date: data?.invoice_status_date,
+      callback_url: data?.callback_url,
+      customer_name: data?.customer_name,
+      customer_logo: data?.customer_logo,
+      currency: data?.currency,
+      mcc_code: data?.mcc_code,
+      legacy_id: data?.legacy_id,
+      vendor_id: data?.vendor_id,
+      process_code_id: data?.process_code_id,
+      qr_image: data?.qr_image,
       invoice_bank_accounts: invoiceBankAccounts,
     });
 
@@ -220,34 +220,34 @@ export default class QPayQuick {
       for (const account of data?.invoice_bank_accounts) {
         invoiceBankAccounts.push(
           new QPayInvoiceBankAccount({
-            id: account['id'],
-            account_bank_code: account['account_bank_code'],
-            account_number: account['account_number'],
-            account_name: account['account_name'],
-            is_default: account['is_default'],
-            invoice_id: account['invoice_id'],
+            id: account?.id,
+            account_bank_code: account?.account_bank_code,
+            account_number: account?.account_number,
+            account_name: account?.account_name,
+            is_default: account?.is_default,
+            invoice_id: account?.invoice_id,
           }),
         );
       }
     }
 
     const invoice: QPayInvoiceResponse = new QPayInvoiceResponse({
-      id: data['id'],
-      terminal_id: data['terminal_id'],
-      amount: data['amount'],
-      qr_code: data['qr_code'],
-      description: data['description'],
-      invoice_status: data['invoice_status'],
-      invoice_status_date: data['invoice_status_date'],
-      callback_url: data['callback_url'],
-      customer_name: data['customer_name'],
-      customer_logo: data['customer_logo'],
-      currency: data['currency'],
-      mcc_code: data['mcc_code'],
-      legacy_id: data['legacy_id'],
-      vendor_id: data['vendor_id'],
-      process_code_id: data['process_code_id'],
-      qr_image: data['qr_image'],
+      id: data?.id,
+      terminal_id: data?.terminal_id,
+      amount: data?.amount,
+      qr_code: data?.qr_code,
+      description: data?.description,
+      invoice_status: data?.invoice_status,
+      invoice_status_date: data?.invoice_status_date,
+      callback_url: data?.callback_url,
+      customer_name: data?.customer_name,
+      customer_logo: data?.customer_logo,
+      currency: data?.currency,
+      mcc_code: data?.mcc_code,
+      legacy_id: data?.legacy_id,
+      vendor_id: data?.vendor_id,
+      process_code_id: data?.process_code_id,
+      qr_image: data?.qr_image,
       invoice_bank_accounts: invoiceBankAccounts,
     });
 
@@ -268,9 +268,9 @@ export default class QPayQuick {
 
     if (response.ok) {
       const checkPaymentResponse: QPayCheckPaymentResponse = new QPayCheckPaymentResponse({
-        id: data['id'],
-        invoice_status: (data['invoice_status'] as InvoiceStatus) || InvoiceStatus.Open,
-        invoice_status_date: data['invoice_status_date'],
+        id: data?.id,
+        invoice_status: (data?.invoice_status as InvoiceStatus) || InvoiceStatus.Open,
+        invoice_status_date: data?.invoice_status_date,
       });
 
       return checkPaymentResponse;
