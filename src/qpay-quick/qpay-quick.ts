@@ -1,4 +1,4 @@
-import QPayCreateInvoiceResponse from "./qpay-create-invoice-response";
+import QPayInvoiceResponse from "./qpay-invoice-response";
 import QPayInvoice from "./qpay-invoice";
 import QPayInvoiceBankAccount from "./qpay-invoice-bank-account";
 import QPayTokenResponse from "./qpay-token-response";
@@ -174,7 +174,62 @@ export default class QPayQuick {
       }
     }
 
-    const invoice: QPayCreateInvoiceResponse = new QPayCreateInvoiceResponse({
+    const invoice: QPayInvoiceResponse = new QPayInvoiceResponse({
+      id: data["id"],
+      terminal_id: data["terminal_id"],
+      amount: data["amount"],
+      qr_code: data["qr_code"],
+      description: data["description"],
+      invoice_status: data["invoice_status"],
+      invoice_status_date: data["invoice_status_date"],
+      callback_url: data["callback_url"],
+      customer_name: data["customer_name"],
+      customer_logo: data["customer_logo"],
+      currency: data["currency"],
+      mcc_code: data["mcc_code"],
+      legacy_id: data["legacy_id"],
+      vendor_id: data["vendor_id"],
+      process_code_id: data["process_code_id"],
+      qr_image: data["qr_image"],
+      invoice_bank_accounts: invoiceBankAccounts,
+    });
+
+    return invoice;
+  }
+
+  async getInvoice(invoiceId: string) {
+    const response = await fetch(`${this._host}/v2/invoice/${invoiceId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(JSON.stringify(data));
+    }
+
+    const invoiceBankAccounts: QPayInvoiceBankAccount[] = [];
+
+    if (Array.isArray(data?.invoice_bank_accounts)) {
+      for (const account of data?.invoice_bank_accounts) {
+        invoiceBankAccounts.push(
+          new QPayInvoiceBankAccount({
+            id: account["id"],
+            account_bank_code: account["account_bank_code"],
+            account_number: account["account_number"],
+            account_name: account["account_name"],
+            is_default: account["is_default"],
+            invoice_id: account["invoice_id"],
+          })
+        );
+      }
+    }
+
+    const invoice: QPayInvoiceResponse = new QPayInvoiceResponse({
       id: data["id"],
       terminal_id: data["terminal_id"],
       amount: data["amount"],

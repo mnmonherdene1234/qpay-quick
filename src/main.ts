@@ -9,7 +9,8 @@ async function main() {
     terminalId: "95000059",
   });
 
-  await createAmountInvoice();
+  // await createAmountInvoice();
+  await getInvoice();
 }
 
 main();
@@ -41,4 +42,14 @@ async function createAmountInvoice() {
   } catch (error) {
     console.error(error);
   }
+}
+
+async function getInvoice() {
+  const qpayQuick: QPayQuick = await QPayQuick.getInstanceAsync();
+
+  const result = await qpayQuick.getInvoice(
+    "f5c84a2a-0197-4275-95b2-c138b901348e"
+  );
+
+  console.log(result);
 }

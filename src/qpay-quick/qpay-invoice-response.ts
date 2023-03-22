@@ -1,6 +1,6 @@
 import QPayInvoiceBankAccount from "./qpay-invoice-bank-account";
 
-export default class QPayCreateInvoiceResponse {
+export default class QPayInvoiceResponse {
   id: string = "";
   terminal_id: string = "";
   amount: string = "";
