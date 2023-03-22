@@ -3,11 +3,7 @@ import QPayInvoice from './dto/qpay-invoice';
 import QPayInvoiceBankAccount from './dto/qpay-invoice-bank-account';
 import QPayTokenResponse from './dto/qpay-token-response';
 import QPayCheckPaymentResponse, { InvoiceStatus } from './dto/qpay-check-payment-response';
-
-export enum QPayEnvironment {
-  Production = 'PRODUCTION',
-  Development = 'DEVELOPMENT',
-}
+import { QPayEnvironment } from './dto/qpay-enumerations';
 
 export default class QPayQuick {
   private static instance: QPayQuick;
@@ -51,6 +47,8 @@ export default class QPayQuick {
 
       await QPayQuick.instance.token();
     }
+
+    return QPayQuick.instance;
   }
 
   public static async getInstance(): Promise<QPayQuick> {
