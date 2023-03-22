@@ -2,6 +2,9 @@ import QPayInvoiceResponse from "./qpay-invoice-response";
 import QPayInvoice from "./qpay-invoice";
 import QPayInvoiceBankAccount from "./qpay-invoice-bank-account";
 import QPayTokenResponse from "./qpay-token-response";
+import QPayCheckPaymentResponse, {
+  InvoiceStatus,
+} from "./qpay-check-payment-response";
 
 export enum QPayEnvironment {
   Production = "PRODUCTION",
@@ -25,7 +28,7 @@ export default class QPayQuick {
 
   private constructor() {}
 
-  public static setup({
+  public static async setup({
     username,
     password,
     terminalId,
@@ -48,22 +51,11 @@ export default class QPayQuick {
         QPayQuick.instance._host = "https://sandbox-quickqr.qpay.mn";
       }
 
-      QPayQuick.instance.token();
+      await QPayQuick.instance.token();
     }
   }
 
-  public static getInstance(): QPayQuick {
-    if (!QPayQuick.instance) {
-      QPayQuick.instance = new QPayQuick();
-      setInterval(QPayQuick.instance.checkExpiration, 1000 * 60);
-    }
-
-    QPayQuick.instance.token();
-
-    return QPayQuick.instance;
-  }
-
-  public static async getInstanceAsync(): Promise<QPayQuick> {
+  public static async getInstance(): Promise<QPayQuick> {
     if (!QPayQuick.instance) {
       QPayQuick.instance = new QPayQuick();
       setInterval(QPayQuick.instance.checkExpiration, 1000 * 60);
@@ -250,6 +242,33 @@ export default class QPayQuick {
     });
 
     return invoice;
+  }
+
+  async checkPayment(invoiceId: string) {
+    const response = await fetch(`${this._host}/v2/payment/check`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+      body: JSON.stringify({ invoice_id: invoiceId }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const checkPaymentResponse: QPayCheckPaymentResponse =
+        new QPayCheckPaymentResponse({
+          id: data["id"],
+          invoice_status:
+            (data["invoice_status"] as InvoiceStatus) || InvoiceStatus.Open,
+          invoice_status_date: data["invoice_status_date"],
+        });
+
+      return checkPaymentResponse;
+    } else {
+      throw new Error(JSON.stringify(data));
+    }
   }
 
   async checkExpiration() {
