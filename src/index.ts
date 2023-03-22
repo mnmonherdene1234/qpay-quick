@@ -3,7 +3,13 @@ import QPayInvoice from './dto/qpay-invoice';
 import QPayInvoiceBankAccount from './dto/qpay-invoice-bank-account';
 import QPayTokenResponse from './dto/qpay-token-response';
 import QPayCheckPaymentResponse, { InvoiceStatus } from './dto/qpay-check-payment-response';
-import { AccountBankCode, QPayEnvironment } from './dto/qpay-enumerations';
+import { AccountBankCode, MerchantType, QPayEnvironment } from './dto/qpay-enumerations';
+import QPayCompanyMerchant from './dto/merchants/qpay-company-merchant';
+import QPayCompanyMerchantResponse from './dto/merchants/qpay-company-merchant-response';
+import QPayPersonMerchant from './dto/merchants/qpay-person-merchant';
+import QPayPersonMerchantResponse from './dto/merchants/qpay-person-merchant-response';
+import QPayMerchantListRow from './dto/merchants/qpay-merchant-list-row';
+import QPayMerchantsList from './dto/merchants/qpay-merchants-list';
 
 export default class QPayQuick {
   private static instance: QPayQuick;
@@ -141,7 +147,7 @@ export default class QPayQuick {
     }
   }
 
-  async createInvoice(qpayInvoice: QPayInvoice) {
+  async createInvoice(qpayInvoice: QPayInvoice): Promise<QPayInvoiceResponse> {
     const response = await fetch(`${this._host}/v2/invoice`, {
       method: 'POST',
       headers: {
@@ -157,24 +163,21 @@ export default class QPayQuick {
       throw new Error(JSON.stringify(data));
     }
 
-    const invoiceBankAccounts: QPayInvoiceBankAccount[] = [];
+    const invoiceBankAccounts = Array.isArray(data?.invoice_bank_accounts)
+      ? data?.invoice_bank_accounts.map(
+          (account: any) =>
+            new QPayInvoiceBankAccount({
+              id: account?.id,
+              account_bank_code: account?.account_bank_code as AccountBankCode,
+              account_number: account?.account_number,
+              account_name: account?.account_name,
+              is_default: account?.is_default,
+              invoice_id: account?.invoice_id,
+            }),
+        )
+      : [];
 
-    if (Array.isArray(data?.invoice_bank_accounts)) {
-      for (const account of data?.invoice_bank_accounts) {
-        invoiceBankAccounts.push(
-          new QPayInvoiceBankAccount({
-            id: account?.id,
-            account_bank_code: account?.account_bank_code as AccountBankCode,
-            account_number: account?.account_number,
-            account_name: account?.account_name,
-            is_default: account?.is_default,
-            invoice_id: account?.invoice_id,
-          }),
-        );
-      }
-    }
-
-    const invoice: QPayInvoiceResponse = new QPayInvoiceResponse({
+    return new QPayInvoiceResponse({
       id: data?.id,
       terminal_id: data?.terminal_id,
       amount: data?.amount,
@@ -193,8 +196,6 @@ export default class QPayQuick {
       qr_image: data?.qr_image,
       invoice_bank_accounts: invoiceBankAccounts,
     });
-
-    return invoice;
   }
 
   async getInvoice(invoiceId: string) {
@@ -250,6 +251,123 @@ export default class QPayQuick {
     });
 
     return invoice;
+  }
+
+  async createComapanyMerchant(company: QPayCompanyMerchant): Promise<QPayCompanyMerchantResponse> {
+    const response = await fetch(`${this._host}/v2/merchant/company`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+      body: JSON.stringify(company),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const result = new QPayCompanyMerchantResponse({
+        id: data?.id,
+        vendor_id: data?.vendor_id,
+        type: data?.type as MerchantType,
+        register_number: data?.register_number,
+        name: data?.name,
+        owner_register_no: data?.owner_register_no,
+        owner_first_name: data?.owner_first_name,
+        owner_last_name: data?.owner_last_name,
+        mcc_code: data?.mcc_code,
+        city: data?.city,
+        district: data?.district,
+        address: data?.address,
+        phone: data?.phone,
+        email: data?.email,
+        location_lat: data?.location_lat,
+        location_lng: data?.location_lng,
+      });
+
+      return result;
+    } else {
+      throw new Error(JSON.stringify(data));
+    }
+  }
+
+  async createPersonMerchant(person: QPayPersonMerchant): Promise<QPayPersonMerchantResponse> {
+    const response = await fetch(`${this._host}/v2/merchant/person`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+      body: JSON.stringify(person),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const result = new QPayPersonMerchantResponse({
+        id: data?.id,
+        vendor_id: data?.vendor_id,
+        type: data?.type as MerchantType,
+        first_name: data?.first_name,
+        last_name: data?.last_name,
+        register_number: data?.register_number,
+        mcc_code: data?.mcc_code,
+        city: data?.city,
+        district: data?.district,
+        address: data?.address,
+        phone: data?.phone,
+        email: data?.email,
+      });
+
+      return result;
+    } else {
+      throw new Error(JSON.stringify(data));
+    }
+  }
+
+  async getMerchantsList(query: { offset: { page_number: number; page_limit: number } }): Promise<QPayMerchantsList> {
+    const response = await fetch(`${this._host}/v2/merchant/list`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+      body: JSON.stringify(query),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const rows: QPayMerchantListRow[] = Array.isArray(data?.rows)
+        ? data?.rows?.map(
+            (row: any) =>
+              new QPayMerchantListRow({
+                id: row?.id,
+                type: row?.type as MerchantType,
+                register_number: row?.register_number,
+                name: row?.name,
+                first_name: row?.first_name,
+                last_name: row?.last_name,
+                mcc_code: row?.mcc_code,
+                city: row?.city,
+                district: row?.district,
+                address: row?.address,
+                phone: row?.phone,
+                email: row?.email,
+                created_date: row?.created_date,
+              }),
+          )
+        : [];
+
+      const result: QPayMerchantsList = new QPayMerchantsList({
+        count: data?.count,
+        rows,
+      });
+
+      return result;
+    } else {
+      throw new Error(JSON.stringify(data));
+    }
   }
 
   async checkPayment(invoiceId: string) {

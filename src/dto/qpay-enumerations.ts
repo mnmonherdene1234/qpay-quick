@@ -3,6 +3,11 @@ export enum QPayEnvironment {
   Development = 'DEVELOPMENT',
 }
 
+export enum MerchantType {
+  Company = 'COMPANY',
+  Person = 'PERSON',
+}
+
 /**
  * Enum for bank
  * @readonly
