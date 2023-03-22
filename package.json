@@ -1,6 +1,6 @@
 {
   "name": "qpay-quick",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "qpay quick api",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
