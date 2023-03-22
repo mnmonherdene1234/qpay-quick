@@ -1,15 +1,15 @@
 export default class QPayBankAccount {
   default: boolean = true;
-  account_bank_code: string = "";
-  account_number: string = "";
-  account_name: string = "";
+  account_bank_code: string = '';
+  account_number: string = '';
+  account_name: string = '';
   is_default: boolean = true;
 
   constructor({
     $default = true,
-    account_bank_code = "",
-    account_number = "",
-    account_name = "",
+    account_bank_code = '',
+    account_number = '',
+    account_name = '',
     is_default = true,
   }: {
     $default?: boolean;

@@ -1,20 +1,20 @@
 export default class QPayTokenResponse {
-  token_type: string = "";
+  token_type: string = '';
   refresh_expires_in: number = 0;
-  refresh_token: string = "";
-  access_token: string = "";
+  refresh_token: string = '';
+  access_token: string = '';
   expires_in: number = 0;
-  scope: string = "";
-  session_state: string = "";
+  scope: string = '';
+  session_state: string = '';
 
   constructor({
-    token_type = "",
+    token_type = '',
     refresh_expires_in = 0,
-    refresh_token = "",
-    access_token = "",
+    refresh_token = '',
+    access_token = '',
     expires_in = 0,
-    scope = "",
-    session_state = "",
+    scope = '',
+    session_state = '',
   }: {
     token_type?: string;
     refresh_expires_in?: number;

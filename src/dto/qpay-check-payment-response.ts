@@ -1,17 +1,17 @@
 export enum InvoiceStatus {
-  Open = "OPEN",
-  Close = "CLOSE",
+  Open = 'OPEN',
+  Close = 'CLOSE',
 }
 
 export default class QPayCheckPaymentResponse {
-  id: string = "";
+  id: string = '';
   invoice_status: InvoiceStatus = InvoiceStatus.Open;
-  invoice_status_date: string = "";
+  invoice_status_date: string = '';
 
   constructor({
-    id = "",
+    id = '',
     invoice_status = InvoiceStatus.Open,
-    invoice_status_date = "",
+    invoice_status_date = '',
   }: {
     id?: string;
     invoice_status?: InvoiceStatus;

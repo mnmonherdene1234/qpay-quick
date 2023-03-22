@@ -1,18 +1,18 @@
 export default class QPayInvoiceBankAccount {
-  id: string = "";
-  account_bank_code: string = "";
-  account_number: string = "";
-  account_name: string = "";
+  id: string = '';
+  account_bank_code: string = '';
+  account_number: string = '';
+  account_name: string = '';
   is_default: boolean = true;
-  invoice_id: string = "";
+  invoice_id: string = '';
 
   constructor({
-    id = "",
-    account_bank_code = "",
-    account_number = "",
-    account_name = "",
+    id = '',
+    account_bank_code = '',
+    account_number = '',
+    account_name = '',
     is_default = true,
-    invoice_id = "",
+    invoice_id = '',
   }: {
     id?: string;
     account_bank_code?: string;
