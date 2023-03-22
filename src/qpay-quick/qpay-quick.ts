@@ -3,29 +3,62 @@ import QPayInvoice from "./qpay-invoice";
 import QPayInvoiceBankAccount from "./qpay-invoice-bank-account";
 import QPayTokenResponse from "./qpay-token-response";
 
+export enum QPayEnvironment {
+  Production = "PRODUCTION",
+  Development = "DEVELOPMENT",
+}
+
 export default class QPayQuick {
   private static instance: QPayQuick;
 
-  private username: string = "TEST_VENDOR_MERCHANT";
-  private password: string = "123456";
+  private username: string = "";
+  private password: string = "";
+  private terminalId: string = "";
   private accessToken: string = "";
   private expiresIn: Date = new Date();
   private refreshExpiresIn: Date = new Date();
   private refreshToken: string = "";
-  private _host: string = "https://sandbox-quickqr.qpay.mn";
-
+  private _host: string = "";
   get host() {
     return this._host;
   }
 
   private constructor() {}
 
+  public static setup({
+    username,
+    password,
+    terminalId,
+    env = QPayEnvironment.Development,
+  }: {
+    username: string;
+    password: string;
+    terminalId: string;
+    env?: QPayEnvironment;
+  }) {
+    if (!QPayQuick.instance) {
+      QPayQuick.instance = new QPayQuick();
+      QPayQuick.instance.username = username;
+      QPayQuick.instance.password = password;
+      QPayQuick.instance.terminalId = terminalId;
+
+      if (env === QPayEnvironment.Production) {
+        QPayQuick.instance._host = "https://quickqr.qpay.mn";
+      } else {
+        QPayQuick.instance._host = "https://sandbox-quickqr.qpay.mn";
+      }
+
+      QPayQuick.instance.token();
+    }
+  }
+
   public static getInstance(): QPayQuick {
     if (!QPayQuick.instance) {
       QPayQuick.instance = new QPayQuick();
-      QPayQuick.instance.token();
       setInterval(QPayQuick.instance.checkExpiration, 1000 * 60);
     }
+
+    QPayQuick.instance.token();
 
     return QPayQuick.instance;
   }
@@ -33,9 +66,10 @@ export default class QPayQuick {
   public static async getInstanceAsync(): Promise<QPayQuick> {
     if (!QPayQuick.instance) {
       QPayQuick.instance = new QPayQuick();
-      await QPayQuick.instance.token();
       setInterval(QPayQuick.instance.checkExpiration, 1000 * 60);
     }
+
+    await QPayQuick.instance.token();
 
     return QPayQuick.instance;
   }
@@ -50,7 +84,7 @@ export default class QPayQuick {
         ).toString("base64")}`,
       },
       body: JSON.stringify({
-        terminal_id: "1679466041",
+        terminal_id: this.terminalId,
       }),
     });
 
@@ -108,7 +142,7 @@ export default class QPayQuick {
   }
 
   async createInvoice(qpayInvoice: QPayInvoice) {
-    const response = await fetch(`${this._host}/v2/auth/refresh`, {
+    const response = await fetch(`${this._host}/v2/invoice`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -164,11 +198,15 @@ export default class QPayQuick {
   }
 
   async checkExpiration() {
-    const expiresDate = new Date(this.expiresIn);
-    expiresDate.setHours(expiresDate.getHours() - 1, 0, 0, 0);
+    const expiresIn = new Date(this.expiresIn);
+    expiresIn.setHours(expiresIn.getHours() - 1, 0, 0, 0);
+
+    const refreshExpiresIn = new Date(this.refreshExpiresIn);
+    refreshExpiresIn.setHours(refreshExpiresIn.getHours() - 1, 0, 0, 0);
+
     const now = new Date();
 
-    if (now > expiresDate) {
+    if (now > expiresIn || now > refreshExpiresIn) {
       await this.refresh();
     }
   }
