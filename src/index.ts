@@ -21,10 +21,7 @@ export default class QPayQuick {
   private expiresIn: Date = new Date();
   private refreshExpiresIn: Date = new Date();
   private refreshToken: string = '';
-  private _host: string = '';
-  get host() {
-    return this._host;
-  }
+  private host: string = '';
 
   private constructor() {}
 
@@ -46,9 +43,9 @@ export default class QPayQuick {
       QPayQuick.instance.terminalId = terminalId;
 
       if (env === QPayEnvironment.Production) {
-        QPayQuick.instance._host = 'https://quickqr.qpay.mn';
+        QPayQuick.instance.host = 'https://quickqr.qpay.mn';
       } else {
-        QPayQuick.instance._host = 'https://sandbox-quickqr.qpay.mn';
+        QPayQuick.instance.host = 'https://sandbox-quickqr.qpay.mn';
       }
 
       await QPayQuick.instance.token();
@@ -69,7 +66,7 @@ export default class QPayQuick {
   }
 
   async token() {
-    const response = await fetch(`${this._host}/v2/auth/token`, {
+    const response = await fetch(`${this.host}/v2/auth/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -103,7 +100,7 @@ export default class QPayQuick {
   }
 
   async refresh() {
-    const response = await fetch(`${this._host}/v2/auth/refresh`, {
+    const response = await fetch(`${this.host}/v2/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -148,7 +145,7 @@ export default class QPayQuick {
   }
 
   async createInvoice(qpayInvoice: QPayInvoice): Promise<QPayInvoiceResponse> {
-    const response = await fetch(`${this._host}/v2/invoice`, {
+    const response = await fetch(`${this.host}/v2/invoice`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -199,7 +196,7 @@ export default class QPayQuick {
   }
 
   async getInvoice(invoiceId: string) {
-    const response = await fetch(`${this._host}/v2/invoice/${invoiceId}`, {
+    const response = await fetch(`${this.host}/v2/invoice/${invoiceId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -254,7 +251,7 @@ export default class QPayQuick {
   }
 
   async createComapanyMerchant(company: QPayCompanyMerchant): Promise<QPayCompanyMerchantResponse> {
-    const response = await fetch(`${this._host}/v2/merchant/company`, {
+    const response = await fetch(`${this.host}/v2/merchant/company`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -292,7 +289,7 @@ export default class QPayQuick {
   }
 
   async createPersonMerchant(person: QPayPersonMerchant): Promise<QPayPersonMerchantResponse> {
-    const response = await fetch(`${this._host}/v2/merchant/person`, {
+    const response = await fetch(`${this.host}/v2/merchant/person`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -326,7 +323,7 @@ export default class QPayQuick {
   }
 
   async getMerchantsList(query: { offset: { page_number: number; page_limit: number } }): Promise<QPayMerchantsList> {
-    const response = await fetch(`${this._host}/v2/merchant/list`, {
+    const response = await fetch(`${this.host}/v2/merchant/list`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -371,7 +368,7 @@ export default class QPayQuick {
   }
 
   async checkPayment(invoiceId: string) {
-    const response = await fetch(`${this._host}/v2/payment/check`, {
+    const response = await fetch(`${this.host}/v2/payment/check`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

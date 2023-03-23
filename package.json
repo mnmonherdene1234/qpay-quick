@@ -1,6 +1,6 @@
 {
   "name": "qpay-quick",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "qpay quick api",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,7 +24,8 @@
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "pub": "npm version patch --force && npm publish"
   },
   "repository": {
     "type": "git",
