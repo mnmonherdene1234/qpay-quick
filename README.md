@@ -1,5 +1,5 @@
 # qpay-quick
-# setup
+## setup
 ```typescript
 const qpayQuick = await QPayQuick.setup({
     username: "TEST_VENDOR_MERCHANT",
@@ -7,7 +7,7 @@ const qpayQuick = await QPayQuick.setup({
     terminalId: "95000059",
 });
 ```
-# getInstance
+## getInstance
 ```typescript
 const qpayQuick = await QPayQuick.getInstance();
 ```
