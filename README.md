@@ -35,8 +35,11 @@ const qpayQuick = await QPayQuick.getInstance();
 
   const result = await qpayQuick.createInvoice(invoice);
 ```
+
 ## getInvoice
+```typescript
 const invoice = await qpayQuick.getInvoice("97181a8e-b85b-41c0-b745-114ce4459a07");
+```
 
 ## createComapanyMerchant
 ```typescript
