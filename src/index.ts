@@ -1,16 +1,17 @@
-import QPayInvoiceResponse from './dto/qpay-invoice-response';
-import QPayInvoice from './dto/qpay-invoice';
-import QPayInvoiceBankAccount from './dto/qpay-invoice-bank-account';
-import QPayTokenResponse from './dto/qpay-token-response';
-import QPayCheckPaymentResponse, { InvoiceStatus } from './dto/qpay-check-payment-response';
-import { AccountBankCode, MerchantType, QPayEnvironment } from './dto/qpay-enumerations';
-import QPayCompanyMerchant from './dto/merchants/qpay-company-merchant';
-import QPayCompanyMerchantResponse from './dto/merchants/qpay-company-merchant-response';
-import QPayPersonMerchant from './dto/merchants/qpay-person-merchant';
-import QPayPersonMerchantResponse from './dto/merchants/qpay-person-merchant-response';
-import QPayMerchantListRow from './dto/merchants/qpay-merchant-list-row';
-import QPayMerchantsList from './dto/merchants/qpay-merchants-list';
-
+import {
+  QPayCheckPaymentResponse,
+  QPayCompanyMerchant,
+  QPayCompanyMerchantResponse,
+  QPayInvoice,
+  QPayInvoiceBankAccount,
+  QPayInvoiceResponse,
+  QPayMerchantListRow,
+  QPayMerchantsList,
+  QPayPersonMerchant,
+  QPayPersonMerchantResponse,
+  QPayTokenResponse,
+} from './types';
+import { AccountBankCode, InvoiceStatus, MerchantType, QPayEnvironment } from './types/qpay-enumerations';
 export default class QPayQuick {
   private static instance: QPayQuick;
 
@@ -80,7 +81,7 @@ export default class QPayQuick {
     if (response.ok) {
       const data = await response.json();
 
-      const tokenResponse = new QPayTokenResponse({
+      const tokenResponse: QPayTokenResponse = {
         token_type: data?.token_type,
         refresh_expires_in: data?.refresh_expires_in,
         refresh_token: data?.refresh_token,
@@ -88,7 +89,7 @@ export default class QPayQuick {
         expires_in: data?.expires_in,
         scope: data?.scope,
         session_state: data?.session_state,
-      });
+      };
 
       this.accessToken = tokenResponse.access_token;
       this.refreshToken = tokenResponse.refresh_token;
@@ -111,7 +112,7 @@ export default class QPayQuick {
     if (response.ok) {
       const data = await response.json();
 
-      const tokenResponse = new QPayTokenResponse({
+      const tokenResponse: QPayTokenResponse = {
         token_type: data?.token_type,
         refresh_expires_in: data?.refresh_expires_in,
         refresh_token: data?.refresh_token,
@@ -119,7 +120,7 @@ export default class QPayQuick {
         expires_in: data?.expires_in,
         scope: data?.scope,
         session_state: data?.session_state,
-      });
+      };
 
       this.accessToken = tokenResponse.access_token;
       this.refreshToken = tokenResponse.refresh_token;
@@ -161,20 +162,17 @@ export default class QPayQuick {
     }
 
     const invoiceBankAccounts = Array.isArray(data?.invoice_bank_accounts)
-      ? data?.invoice_bank_accounts.map(
-          (account: any) =>
-            new QPayInvoiceBankAccount({
-              id: account?.id,
-              account_bank_code: account?.account_bank_code as AccountBankCode,
-              account_number: account?.account_number,
-              account_name: account?.account_name,
-              is_default: account?.is_default,
-              invoice_id: account?.invoice_id,
-            }),
-        )
+      ? data?.invoice_bank_accounts.map((account: any) => ({
+          id: account?.id,
+          account_bank_code: account?.account_bank_code as AccountBankCode,
+          account_number: account?.account_number,
+          account_name: account?.account_name,
+          is_default: account?.is_default,
+          invoice_id: account?.invoice_id,
+        }))
       : [];
 
-    return new QPayInvoiceResponse({
+    return {
       id: data?.id,
       terminal_id: data?.terminal_id,
       amount: data?.amount,
@@ -192,7 +190,7 @@ export default class QPayQuick {
       process_code_id: data?.process_code_id,
       qr_image: data?.qr_image,
       invoice_bank_accounts: invoiceBankAccounts,
-    });
+    };
   }
 
   async getInvoice(invoiceId: string) {
@@ -214,20 +212,18 @@ export default class QPayQuick {
 
     if (Array.isArray(data?.invoice_bank_accounts)) {
       for (const account of data?.invoice_bank_accounts) {
-        invoiceBankAccounts.push(
-          new QPayInvoiceBankAccount({
-            id: account?.id,
-            account_bank_code: account?.account_bank_code as AccountBankCode,
-            account_number: account?.account_number,
-            account_name: account?.account_name,
-            is_default: account?.is_default,
-            invoice_id: account?.invoice_id,
-          }),
-        );
+        invoiceBankAccounts.push({
+          id: account?.id,
+          account_bank_code: account?.account_bank_code as AccountBankCode,
+          account_number: account?.account_number,
+          account_name: account?.account_name,
+          is_default: account?.is_default,
+          invoice_id: account?.invoice_id,
+        });
       }
     }
 
-    const invoice: QPayInvoiceResponse = new QPayInvoiceResponse({
+    const invoice: QPayInvoiceResponse = {
       id: data?.id,
       terminal_id: data?.terminal_id,
       amount: data?.amount,
@@ -245,7 +241,7 @@ export default class QPayQuick {
       process_code_id: data?.process_code_id,
       qr_image: data?.qr_image,
       invoice_bank_accounts: invoiceBankAccounts,
-    });
+    };
 
     return invoice;
   }
@@ -263,7 +259,7 @@ export default class QPayQuick {
     const data = await response.json();
 
     if (response.ok) {
-      const result = new QPayCompanyMerchantResponse({
+      const result: QPayCompanyMerchantResponse = {
         id: data?.id,
         vendor_id: data?.vendor_id,
         type: data?.type as MerchantType,
@@ -280,7 +276,7 @@ export default class QPayQuick {
         email: data?.email,
         location_lat: data?.location_lat,
         location_lng: data?.location_lng,
-      });
+      };
 
       return result;
     } else {
@@ -301,7 +297,7 @@ export default class QPayQuick {
     const data = await response.json();
 
     if (response.ok) {
-      const result = new QPayPersonMerchantResponse({
+      const result: QPayPersonMerchantResponse = {
         id: data?.id,
         vendor_id: data?.vendor_id,
         type: data?.type as MerchantType,
@@ -314,7 +310,7 @@ export default class QPayQuick {
         address: data?.address,
         phone: data?.phone,
         email: data?.email,
-      });
+      };
 
       return result;
     } else {
@@ -336,30 +332,27 @@ export default class QPayQuick {
 
     if (response.ok) {
       const rows: QPayMerchantListRow[] = Array.isArray(data?.rows)
-        ? data?.rows?.map(
-            (row: any) =>
-              new QPayMerchantListRow({
-                id: row?.id,
-                type: row?.type as MerchantType,
-                register_number: row?.register_number,
-                name: row?.name,
-                first_name: row?.first_name,
-                last_name: row?.last_name,
-                mcc_code: row?.mcc_code,
-                city: row?.city,
-                district: row?.district,
-                address: row?.address,
-                phone: row?.phone,
-                email: row?.email,
-                created_date: row?.created_date,
-              }),
-          )
+        ? data?.rows?.map((row: any) => ({
+            id: row?.id,
+            type: row?.type as MerchantType,
+            register_number: row?.register_number,
+            name: row?.name,
+            first_name: row?.first_name,
+            last_name: row?.last_name,
+            mcc_code: row?.mcc_code,
+            city: row?.city,
+            district: row?.district,
+            address: row?.address,
+            phone: row?.phone,
+            email: row?.email,
+            created_date: row?.created_date,
+          }))
         : [];
 
-      const result: QPayMerchantsList = new QPayMerchantsList({
+      const result: QPayMerchantsList = {
         count: data?.count,
         rows,
-      });
+      };
 
       return result;
     } else {
@@ -380,11 +373,11 @@ export default class QPayQuick {
     const data = await response.json();
 
     if (response.ok) {
-      const checkPaymentResponse: QPayCheckPaymentResponse = new QPayCheckPaymentResponse({
+      const checkPaymentResponse: QPayCheckPaymentResponse = {
         id: data?.id,
         invoice_status: (data?.invoice_status as InvoiceStatus) || InvoiceStatus.Open,
         invoice_status_date: data?.invoice_status_date,
-      });
+      };
 
       return checkPaymentResponse;
     } else {
@@ -392,3 +385,5 @@ export default class QPayQuick {
     }
   }
 }
+
+export * from './types';

@@ -1,8 +1,4 @@
-import QPayQuick from '..';
-import QPayBankAccount from '../dto/qpay-bank-account';
-import { AccountBankCode } from '../dto/qpay-enumerations';
-import QPayInvoice from '../dto/qpay-invoice';
-import QPayInvoiceResponse from '../dto/qpay-invoice-response';
+import QPayQuick, { AccountBankCode, QPayBankAccount, QPayInvoice, QPayInvoiceResponse } from '..';
 
 let invoiceId: string;
 
@@ -13,15 +9,15 @@ test('create invoice', async () => {
     terminalId: '95000059',
   });
 
-  const bankAccount: QPayBankAccount = new QPayBankAccount({
+  const bankAccount: QPayBankAccount = {
     account_name: 'Marlaa Bataa',
     account_number: '490000860',
     account_bank_code: AccountBankCode.TDB,
-    $default: true,
     is_default: true,
-  });
+    default: false,
+  };
 
-  const invoice: QPayInvoice = new QPayInvoice({
+  const invoice: QPayInvoice = {
     merchant_id: '97181a8e-b85b-41c0-b745-114ce4459a07',
     amount: 1000,
     currency: 'MNT',
@@ -30,11 +26,14 @@ test('create invoice', async () => {
     description: 'some description about invoice okay',
     mcc_code: '1234',
     bank_accounts: [bankAccount],
-  });
+    callback_url: '',
+  };
 
   const result = await qpayQuick.createInvoice(invoice);
 
-  expect(result).toBeInstanceOf(QPayInvoiceResponse);
+  expect(typeof result).toBe('object');
+  expect(result).toBeDefined();
+  expect((result as QPayInvoiceResponse).amount).toBeDefined();
 
   invoiceId = result.id;
 });
@@ -46,5 +45,9 @@ test('get invoice', async () => {
     terminalId: '95000059',
   });
 
-  expect(await qpayQuick.getInvoice(invoiceId)).toBeInstanceOf(QPayInvoiceResponse);
+  const result = await qpayQuick.getInvoice(invoiceId);
+
+  expect(typeof result).toBe('object');
+  expect(result).toBeDefined();
+  expect((result as QPayInvoiceResponse).amount).toBeDefined();
 });

@@ -1,7 +1,4 @@
-import QPayQuick from '..';
-import QPayCompanyMerchantResponse from '../dto/merchants/qpay-company-merchant-response';
-import QPayMerchantsList from '../dto/merchants/qpay-merchants-list';
-import QPayPersonMerchantResponse from '../dto/merchants/qpay-person-merchant-response';
+import QPayQuick, { QPayCompanyMerchantResponse, QPayMerchantsList, QPayPersonMerchantResponse } from '..';
 
 test('Create Company ', async () => {
   const qpayQuick: QPayQuick = await QPayQuick.setup({
@@ -26,7 +23,9 @@ test('Create Company ', async () => {
     email: 'mnmonherdene1234@gmail.com',
   });
 
-  expect(result).toBeInstanceOf(QPayCompanyMerchantResponse);
+  expect(typeof result).toBe('object');
+  expect(result).toBeDefined();
+  expect((result as QPayCompanyMerchantResponse).name).toBeDefined();
 });
 
 test('Create Person', async () => {
@@ -48,7 +47,9 @@ test('Create Person', async () => {
     email: 'mnmonherdene1234@gmail.com',
   });
 
-  expect(result).toBeInstanceOf(QPayPersonMerchantResponse);
+  expect(typeof result).toBe('object');
+  expect(result).toBeDefined();
+  expect((result as QPayPersonMerchantResponse).id).toBeDefined();
 });
 
 test('Merchant list', async () => {
@@ -65,5 +66,7 @@ test('Merchant list', async () => {
     },
   });
 
-  expect(result).toBeInstanceOf(QPayMerchantsList);
+  expect(typeof result).toBe('object');
+  expect(result).toBeDefined();
+  expect((result as QPayMerchantsList).count).toBeDefined();
 });

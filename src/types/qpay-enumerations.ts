@@ -8,6 +8,11 @@ export enum MerchantType {
   Person = 'PERSON',
 }
 
+export enum InvoiceStatus {
+  Open = 'OPEN',
+  Paid = 'PAID',
+}
+
 /**
  * Enum for bank
  * @readonly

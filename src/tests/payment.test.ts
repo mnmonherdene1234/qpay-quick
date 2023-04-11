@@ -1,5 +1,4 @@
-import QPayQuick from '..';
-import QPayCheckPaymentResponse from '../dto/qpay-check-payment-response';
+import QPayQuick, { QPayCheckPaymentResponse } from '..';
 
 test('Check Payment', async () => {
   const qpayQuick: QPayQuick = await QPayQuick.setup({
@@ -9,5 +8,7 @@ test('Check Payment', async () => {
   });
   const result = await qpayQuick.checkPayment('e144f8e7-d001-48ce-8a52-f81556df77fb');
 
-  expect(result).toBeInstanceOf(QPayCheckPaymentResponse);
+  expect(typeof result).toBe('object');
+  expect(result).toBeDefined();
+  expect((result as QPayCheckPaymentResponse).invoice_status).toBeDefined();
 });
