@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {
   QPayCheckPaymentResponse,
   QPayCompanyMerchant,
@@ -24,7 +25,7 @@ export default class QPayQuick {
   private refreshToken: string = '';
   private host: string = '';
 
-  private constructor() {}
+  private constructor() { }
 
   public static async setup({
     username,
@@ -67,67 +68,72 @@ export default class QPayQuick {
   }
 
   async token() {
-    const response = await fetch(`${this.host}/v2/auth/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(`${this.username}:${this.password}`).toString('base64')}`,
-      },
-      body: JSON.stringify({
+    try {
+      const response = await axios.post(`${this.host}/v2/auth/token`, {
         terminal_id: this.terminalId,
-      }),
-    });
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(`${this.username}:${this.password}`).toString('base64')}`,
+        },
+      });
 
-    if (response.ok) {
-      const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
 
-      const tokenResponse: QPayTokenResponse = {
-        token_type: data?.token_type,
-        refresh_expires_in: data?.refresh_expires_in,
-        refresh_token: data?.refresh_token,
-        access_token: data?.access_token,
-        expires_in: data?.expires_in,
-        scope: data?.scope,
-        session_state: data?.session_state,
-      };
+        const tokenResponse: QPayTokenResponse = {
+          token_type: data?.token_type,
+          refresh_expires_in: data?.refresh_expires_in,
+          refresh_token: data?.refresh_token,
+          access_token: data?.access_token,
+          expires_in: data?.expires_in,
+          scope: data?.scope,
+          session_state: data?.session_state,
+        };
 
-      this.accessToken = tokenResponse.access_token;
-      this.refreshToken = tokenResponse.refresh_token;
-      this.expiresIn = new Date(tokenResponse.expires_in * 1000);
-      this.refreshExpiresIn = new Date(tokenResponse.refresh_expires_in * 1000);
-    } else {
-      throw new Error(JSON.stringify(await response.json()));
+        this.accessToken = tokenResponse.access_token;
+        this.refreshToken = tokenResponse.refresh_token;
+        this.expiresIn = new Date(tokenResponse.expires_in * 1000);
+        this.refreshExpiresIn = new Date(tokenResponse.refresh_expires_in * 1000);
+      } else {
+        throw new Error(JSON.stringify(response.data));
+      }
+    } catch (error: any) {
+      throw new Error(error.message);
     }
   }
 
   async refresh() {
-    const response = await fetch(`${this.host}/v2/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.refreshToken}`,
-      },
-    });
+    try {
+      const response = await axios.post(`${this.host}/v2/auth/refresh`, null, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.refreshToken}`,
+        },
+      });
 
-    if (response.ok) {
-      const data = await response.json();
+      if (response.status === 200) {
+        const data = response.data;
 
-      const tokenResponse: QPayTokenResponse = {
-        token_type: data?.token_type,
-        refresh_expires_in: data?.refresh_expires_in,
-        refresh_token: data?.refresh_token,
-        access_token: data?.access_token,
-        expires_in: data?.expires_in,
-        scope: data?.scope,
-        session_state: data?.session_state,
-      };
+        const tokenResponse: QPayTokenResponse = {
+          token_type: data?.token_type,
+          refresh_expires_in: data?.refresh_expires_in,
+          refresh_token: data?.refresh_token,
+          access_token: data?.access_token,
+          expires_in: data?.expires_in,
+          scope: data?.scope,
+          session_state: data?.session_state,
+        };
 
-      this.accessToken = tokenResponse.access_token;
-      this.refreshToken = tokenResponse.refresh_token;
-      this.expiresIn = new Date(tokenResponse.expires_in * 1000);
-      this.refreshExpiresIn = new Date(tokenResponse.refresh_expires_in * 1000);
-    } else {
-      throw new Error(JSON.stringify(await response.json()));
+        this.accessToken = tokenResponse.access_token;
+        this.refreshToken = tokenResponse.refresh_token;
+        this.expiresIn = new Date(tokenResponse.expires_in * 1000);
+        this.refreshExpiresIn = new Date(tokenResponse.refresh_expires_in * 1000);
+      } else {
+        throw new Error(JSON.stringify(response.data));
+      }
+    } catch (error: any) {
+      throw new Error(error.message);
     }
   }
 
@@ -146,51 +152,22 @@ export default class QPayQuick {
   }
 
   async createInvoice(qpayInvoice: QPayInvoice): Promise<QPayInvoiceResponse> {
-    const response = await fetch(`${this.host}/v2/invoice`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.accessToken}`,
-      },
-      body: JSON.stringify(qpayInvoice),
-    });
+    try {
+      const response = await axios.post<QPayInvoiceResponse>(`${this.host}/v2/invoice`, qpayInvoice, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.accessToken}`,
+        },
+      });
 
-    const data = await response.json();
+      if (response.status !== 200) {
+        throw new Error(JSON.stringify(response.data));
+      }
 
-    if (!response.ok) {
-      throw new Error(JSON.stringify(data));
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message);
     }
-
-    const invoiceBankAccounts = Array.isArray(data?.invoice_bank_accounts)
-      ? data?.invoice_bank_accounts.map((account: any) => ({
-          id: account?.id,
-          account_bank_code: account?.account_bank_code as AccountBankCode,
-          account_number: account?.account_number,
-          account_name: account?.account_name,
-          is_default: account?.is_default,
-          invoice_id: account?.invoice_id,
-        }))
-      : [];
-
-    return {
-      id: data?.id,
-      terminal_id: data?.terminal_id,
-      amount: data?.amount,
-      qr_code: data?.qr_code,
-      description: data?.description,
-      invoice_status: data?.invoice_status,
-      invoice_status_date: data?.invoice_status_date,
-      callback_url: data?.callback_url,
-      customer_name: data?.customer_name,
-      customer_logo: data?.customer_logo,
-      currency: data?.currency,
-      mcc_code: data?.mcc_code,
-      legacy_id: data?.legacy_id,
-      vendor_id: data?.vendor_id,
-      process_code_id: data?.process_code_id,
-      qr_image: data?.qr_image,
-      invoice_bank_accounts: invoiceBankAccounts,
-    };
   }
 
   async getInvoice(invoiceId: string) {
@@ -333,20 +310,20 @@ export default class QPayQuick {
     if (response.ok) {
       const rows: QPayMerchantListRow[] = Array.isArray(data?.rows)
         ? data?.rows?.map((row: any) => ({
-            id: row?.id,
-            type: row?.type as MerchantType,
-            register_number: row?.register_number,
-            name: row?.name,
-            first_name: row?.first_name,
-            last_name: row?.last_name,
-            mcc_code: row?.mcc_code,
-            city: row?.city,
-            district: row?.district,
-            address: row?.address,
-            phone: row?.phone,
-            email: row?.email,
-            created_date: row?.created_date,
-          }))
+          id: row?.id,
+          type: row?.type as MerchantType,
+          register_number: row?.register_number,
+          name: row?.name,
+          first_name: row?.first_name,
+          last_name: row?.last_name,
+          mcc_code: row?.mcc_code,
+          city: row?.city,
+          district: row?.district,
+          address: row?.address,
+          phone: row?.phone,
+          email: row?.email,
+          created_date: row?.created_date,
+        }))
         : [];
 
       const result: QPayMerchantsList = {
