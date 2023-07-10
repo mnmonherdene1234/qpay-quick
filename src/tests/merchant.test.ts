@@ -23,9 +23,7 @@ test('Create Company ', async () => {
     email: 'mnmonherdene1234@gmail.com',
   });
 
-  expect(typeof result).toBe('object');
-  expect(result).toBeDefined();
-  expect((result as QPayCompanyMerchantResponse).name).toBeDefined();
+  expect(result.data.name).toBeDefined();
 });
 
 test('Create Person', async () => {
@@ -47,9 +45,7 @@ test('Create Person', async () => {
     email: 'mnmonherdene1234@gmail.com',
   });
 
-  expect(typeof result).toBe('object');
-  expect(result).toBeDefined();
-  expect((result as QPayPersonMerchantResponse).id).toBeDefined();
+  expect(result.data.id).toBeDefined();
 });
 
 test('Merchant list', async () => {
@@ -66,7 +62,5 @@ test('Merchant list', async () => {
     },
   });
 
-  expect(typeof result).toBe('object');
-  expect(result).toBeDefined();
-  expect((result as QPayMerchantsList).count).toBeDefined();
+  expect(result.data.count).toBeDefined();
 });

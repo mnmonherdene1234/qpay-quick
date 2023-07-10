@@ -31,11 +31,9 @@ test('create invoice', async () => {
 
   const result = await qpayQuick.createInvoice(invoice);
 
-  expect(typeof result).toBe('object');
-  expect(result).toBeDefined();
-  expect((result as QPayInvoiceResponse).amount).toBeDefined();
+  expect(result.data.amount).toBeDefined();
 
-  invoiceId = result.id;
+  invoiceId = result.data.id;
 });
 
 test('get invoice', async () => {
@@ -47,7 +45,5 @@ test('get invoice', async () => {
 
   const result = await qpayQuick.getInvoice(invoiceId);
 
-  expect(typeof result).toBe('object');
-  expect(result).toBeDefined();
-  expect((result as QPayInvoiceResponse).amount).toBeDefined();
+  expect(result.data.amount).toBeDefined();
 });

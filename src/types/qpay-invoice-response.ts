@@ -1,4 +1,5 @@
 import { QPayInvoiceBankAccount } from './qpay-invoice-bank-account';
+import { QPayUrl } from './qpay-url';
 
 export type QPayInvoiceResponse = {
   id: string;
@@ -18,4 +19,5 @@ export type QPayInvoiceResponse = {
   process_code_id: string;
   qr_image: string;
   invoice_bank_accounts: QPayInvoiceBankAccount[];
+  urls: QPayUrl[];
 };
