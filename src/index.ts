@@ -23,7 +23,7 @@ export default class QPayQuick {
   private refreshToken: string = '';
   private host: string = '';
 
-  private constructor() { }
+  private constructor() {}
 
   public static async setup({
     username,
@@ -58,21 +58,25 @@ export default class QPayQuick {
 
   public static async getInstance(): Promise<QPayQuick> {
     if (!QPayQuick.instance) {
-      throw new Error("INSTANCE_NOT_FOUND");
+      throw new Error('INSTANCE_NOT_FOUND');
     }
 
     return QPayQuick.instance;
   }
 
   async token() {
-    const response = await axios.post<QPayTokenResponse>(`${this.host}/v2/auth/token`, {
-      terminal_id: this.terminalId,
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(`${this.username}:${this.password}`).toString('base64')}`,
+    const response = await axios.post<QPayTokenResponse>(
+      `${this.host}/v2/auth/token`,
+      {
+        terminal_id: this.terminalId,
       },
-    });
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(`${this.username}:${this.password}`).toString('base64')}`,
+        },
+      },
+    );
 
     if (response.status === 200) {
       const data = response.data;
@@ -82,7 +86,7 @@ export default class QPayQuick {
       this.expiresIn = new Date(data.expires_in * 1000);
       this.refreshExpiresIn = new Date(data.refresh_expires_in * 1000);
     } else {
-      throw new Error("TOKEN_ERROR");
+      throw new Error('TOKEN_ERROR');
     }
   }
 
@@ -102,7 +106,7 @@ export default class QPayQuick {
       this.expiresIn = new Date(data.expires_in * 1000);
       this.refreshExpiresIn = new Date(data.refresh_expires_in * 1000);
     } else {
-      throw new Error("REFRESH_ERROR");
+      throw new Error('REFRESH_ERROR');
     }
   }
 
@@ -130,7 +134,7 @@ export default class QPayQuick {
   }
 
   async getInvoice(invoiceId: string) {
-    return axios.get<Omit<QPayInvoiceResponse, "urls">>(`${this.host}/v2/invoice/${invoiceId}`, {
+    return axios.get<Omit<QPayInvoiceResponse, 'urls'>>(`${this.host}/v2/invoice/${invoiceId}`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.accessToken}`,
@@ -143,7 +147,7 @@ export default class QPayQuick {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.accessToken}`,
-      }
+      },
     });
   }
 
@@ -166,12 +170,16 @@ export default class QPayQuick {
   }
 
   async checkPayment(invoiceId: string) {
-    return axios.post<QPayCheckPaymentResponse>(`${this.host}/v2/payment/check`, { invoice_id: invoiceId }, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.accessToken}`,
+    return axios.post<QPayCheckPaymentResponse>(
+      `${this.host}/v2/payment/check`,
+      { invoice_id: invoiceId },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.accessToken}`,
+        },
       },
-    });
+    );
   }
 }
 

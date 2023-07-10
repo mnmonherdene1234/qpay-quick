@@ -6,5 +6,5 @@ export type QPayTokenResponse = {
   expires_in: number;
   scope: string;
   session_state: string;
-  "not-before-policy": string;
+  'not-before-policy': string;
 };
